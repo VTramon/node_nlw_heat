@@ -7,36 +7,61 @@ import { Server } from 'socket.io';
 
 import { router } from './routes';
 
-const app = express();
+const web = express();
+const mobile = express();
 
-app.use(cors());
+web.use(cors());
+mobile.use(cors());
 
-app.use(express.json());
+web.use(express.json());
+mobile.use(express.json());
 
-app.use(router);
+web.use(router);
+mobile.use(router);
 
-const serverHttp = http.createServer(app);
+const webServerHttp = http.createServer(web);
+const mobileServerHttp = http.createServer(mobile);
 
-const io = new Server(serverHttp, {
+const webIo = new Server(webServerHttp, {
+  cors: {
+    origin: '*',
+  },
+});
+const mobileIo = new Server(webServerHttp, {
   cors: {
     origin: '*',
   },
 });
 
-io.on('connection', (Socket) => {
+webIo.on('connection', (Socket) => {
+  console.log(`Usuário conectado no socket ${Socket.id}`);
+});
+mobileIo.on('connection', (Socket) => {
   console.log(`Usuário conectado no socket ${Socket.id}`);
 });
 
-app.get('/github', (req, res) => {
+web.get('/github', (req, res) => {
   res.redirect(
-    `https://github.com/login/oauth/authorize?client_id=${process.env.GITHUB_CLIENT_ID}`
+    `https://github.com/login/oauth/authorize?client_id=${process.env.GITHUB_CLIENT_ID_WEB}`
+  );
+});
+mobile.get('/github', (req, res) => {
+  res.redirect(
+    `https://github.com/login/oauth/authorize?client_id=${process.env.GITHUB_CLIENT_ID_MOBILE}`
   );
 });
 
-app.get('/signin/callback', (req, res) => {
+web.get('/signin/callback', (req, res) => {
+  const { code } = req.query;
+
+  console.log(code);
+
+  return res.json(code);
+});
+mobile.get('/signin/callback', (req, res) => {
   const { code } = req.query;
 
   return res.json(code);
 });
 
-export { serverHttp, io };
+export { webServerHttp, mobileServerHttp, webIo, mobileIo };

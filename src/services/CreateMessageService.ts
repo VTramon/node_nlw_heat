@@ -1,5 +1,5 @@
 import prismaClient from '../prisma';
-import { io } from '../app';
+import { webIo, mobileIo } from '../app';
 
 class CreateMessageService {
   async execute(text: string, user_id: string) {
@@ -24,7 +24,8 @@ class CreateMessageService {
         },
       };
 
-      io.emit('new_message', infoWS);
+      webIo.emit('new_message', infoWS);
+      mobileIo.emit('new_message', infoWS);
 
       return message;
     } catch (error) {
