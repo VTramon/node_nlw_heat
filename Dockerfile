@@ -1,0 +1,18 @@
+
+
+FROM node
+
+ENV GITHUB_CLIENT_ID_WEB=520ffc7ef3c0a245f581
+ENV GITHUB_CLIENT_SECRET_WEB=fb0fa7e2253944bacfec74a1e85273164f0c24f6
+ENV GITHUB_CLIENT_ID_MOBILE=d187dc2eb6a3085ab5bf
+ENV GITHUB_CLIENT_SECRET_MOBILE=1180f1b98cbbf5ea9e3bd8a3565803755e92c583
+ENV JWT_SECRET=5d0ed3d09724c4435680bb3e94380189
+
+WORKDIR /code
+COPY package.json /code/package.json
+COPY . /code
+EXPOSE 3000 4000
+RUN npm install -g typescript
+RUN npm install -g ts-node-dev
+RUN npm install
+CMD [ "npm", "run", "dev" ]
